@@ -1,8 +1,5 @@
-from django.urls import path
-
-from users.views import UsersListCreateView, UserRetrieveUpdateDestroyView
+from django.urls import path, include
 
 urlpatterns = [
-    path('users', UsersListCreateView.as_view()),
-    path('users/<int:pk>', UserRetrieveUpdateDestroyView.as_view())
+    path('computers', include('apps.computer.urls'))
 ]
