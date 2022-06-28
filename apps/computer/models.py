@@ -7,5 +7,5 @@ class ComputerModel(models.Model):
 
     brand = models.CharField(max_length=50)
     model = models.CharField(max_length=50)
-    ram = models.CharField(max_length=50)
+    ram = models.IntegerField()
     monitor = models.CharField(max_length=50)
