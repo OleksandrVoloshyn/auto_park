@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class ComputerConfig(AppConfig):
+class AutoParksConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'apps.computer'
+    name = 'apps.auto_parks'
