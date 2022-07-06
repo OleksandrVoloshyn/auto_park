@@ -1,5 +1,5 @@
 from rest_framework.generics import CreateAPIView, ListCreateAPIView, RetrieveDestroyAPIView
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 
 from apps.cars.serializers import CarCreateSerializer
 
@@ -25,3 +25,8 @@ class AutoParkAddCarView(CreateAPIView):
 class AutoParkRetrieveDestroyView(RetrieveDestroyAPIView):
     queryset = AutoParksModel.objects
     serializer_class = AutoParkSerializer
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [AllowAny()]
+        return super().get_permissions()
