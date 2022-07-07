@@ -20,10 +20,22 @@ class AddAvatarSerializer(ModelSerializer):
         fields = ('avatar',)
 
 
-class ChangeUserPowerSerializer(ModelSerializer):
+class UserStaffSerializer(ModelSerializer):
+    profile = ProfileSerializer()
+
     class Meta:
         model = UserModel
-        fields = ('is_staff',)
+        fields = (
+            'id', 'email', 'password', 'is_staff', 'is_superuser', 'is_active', 'last_login', 'created_at',
+            'updated_at', 'profile'
+        )
+        read_only_fields = ('id', 'email', 'is_superuser', 'is_active', 'last_login', 'created_at',
+                            'updated_at', 'profile')
+        extra_kwargs = {
+            'password': {
+                'write_only': True
+            }
+        }
 
 
 class UserSerializer(ModelSerializer):

@@ -4,7 +4,7 @@ from rest_framework.generics import ListCreateAPIView, UpdateAPIView
 from rest_framework.permissions import AllowAny
 from permissions.user_permissions import IsSuperUser
 
-from .serializers import AddAvatarSerializer, UserSerializer, ChangeUserPowerSerializer
+from .serializers import AddAvatarSerializer, UserSerializer, UserStaffSerializer
 
 UserModel = get_user_model()
 
@@ -16,6 +16,7 @@ class UserListCreateView(ListCreateAPIView):
 
 
 class AddAvatarView(UpdateAPIView):
+    http_method_names = ('patch',)
     serializer_class = AddAvatarSerializer
 
     def get_object(self):
@@ -23,7 +24,8 @@ class AddAvatarView(UpdateAPIView):
 
 
 class UserToAdminUpdateView(UpdateAPIView):
-    serializer_class = ChangeUserPowerSerializer
+    http_method_names = ('patch',)
+    serializer_class = UserStaffSerializer
     queryset = UserModel.objects.all()
     permission_classes = (IsSuperUser,)
 
@@ -32,11 +34,7 @@ class UserToAdminUpdateView(UpdateAPIView):
         serializer.save(is_staff=True)
 
 
-class ToUsualUserUpdateView(UpdateAPIView):
-    serializer_class = ChangeUserPowerSerializer
-    queryset = UserModel.objects.all()
-    permission_classes = (IsSuperUser,)
-
+class AdminToUserUpdateView(UserToAdminUpdateView):
     def perform_update(self, serializer):
         candidate = self.get_object()
         serializer.save(is_staff=False)
