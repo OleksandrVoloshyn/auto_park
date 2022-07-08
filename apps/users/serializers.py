@@ -20,19 +20,6 @@ class AddAvatarSerializer(ModelSerializer):
         fields = ('avatar',)
 
 
-class UserStaffSerializer(ModelSerializer):
-    profile = ProfileSerializer()
-
-    class Meta:
-        model = UserModel
-        fields = (
-            'id', 'email', 'is_staff', 'is_superuser', 'is_active', 'last_login', 'created_at',
-            'updated_at', 'profile'
-        )
-        read_only_fields = ('id', 'email', 'is_superuser', 'is_active', 'last_login', 'created_at',
-                            'updated_at', 'profile')
-
-
 class UserSerializer(ModelSerializer):
     profile = ProfileSerializer()
 

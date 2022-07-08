@@ -1,10 +1,11 @@
 from django.contrib.auth import get_user_model
-
-from rest_framework.generics import ListCreateAPIView, UpdateAPIView
+from rest_framework.generics import ListCreateAPIView, UpdateAPIView, GenericAPIView
 from rest_framework.permissions import AllowAny
-from permissions.user_permissions import IsSuperUser
+from rest_framework import status
+from rest_framework.response import Response
 
-from .serializers import AddAvatarSerializer, UserSerializer, UserStaffSerializer
+from permissions.user_permissions import IsSuperUser
+from .serializers import AddAvatarSerializer, UserSerializer
 
 UserModel = get_user_model()
 
@@ -23,18 +24,30 @@ class AddAvatarView(UpdateAPIView):
         return self.request.user.profile
 
 
-class UserToAdminUpdateView(UpdateAPIView):
+class UserToAdminView(GenericAPIView):
     http_method_names = ('patch',)
-    serializer_class = UserStaffSerializer
+    serializer_class = UserSerializer
     queryset = UserModel.objects.all()
     permission_classes = (IsSuperUser,)
 
-    def perform_update(self, serializer):
+    def patch(self, *args, **kwargs):
         candidate = self.get_object()
-        serializer.save(is_staff=True)
+
+        if not candidate.is_staff:
+            candidate.is_staff = True
+            candidate.save()
+
+        serializer = self.serializer_class(candidate)
+        return Response(serializer.data, status.HTTP_200_OK)
 
 
-class AdminToUserUpdateView(UserToAdminUpdateView):
-    def perform_update(self, serializer):
+class AdminToUserView(UserToAdminView):
+    def patch(self, *args, **kwargs):
         candidate = self.get_object()
-        serializer.save(is_staff=False)
+
+        if candidate.is_staff:
+            candidate.is_staff = False
+            candidate.save()
+
+        serializer = self.serializer_class(candidate)
+        return Response(serializer.data, status.HTTP_200_OK)
