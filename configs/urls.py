@@ -10,4 +10,7 @@ urlpatterns = [
     path('users', include('apps.users.urls'))
 ]
 
+handler400 = 'rest_framework.exceptions.bad_request'
+handler500 = 'rest_framework.exceptions.server_error'
+
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -11,6 +11,7 @@ from .services import get_current_year
 class CarModel(models.Model):
     class Meta:
         db_table = 'cars'
+        ordering = ('id',)
 
     brand = models.CharField(max_length=100, validators=[RegexValidator(RegEx.BRAND.pattern, RegEx.BRAND.msg)])
     price = models.IntegerField(validators=[MinValueValidator(2000), MaxValueValidator(1000000)])
