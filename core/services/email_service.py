@@ -4,7 +4,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template
 
 from core.enums.template_enum import TemplateEnum
-from core.services.jwt_service import JwtService
+from core.services.jwt_service import ActivateToken, JwtService, RecoveryToken
 
 
 class EmailService:
@@ -18,13 +18,12 @@ class EmailService:
 
     @classmethod
     def register_email(cls, user):
-        token = JwtService.create_activate_token(user)
-        url = f'{os.environ.get("FRONTEND_URL")}/auth/activate/{token}'
+        token = JwtService.create_token(user, ActivateToken)
+        url = f'{os.environ.get("FRONTEND_URL")}/activate/{token}'
         cls._send_email(user.email, TemplateEnum.REGISTER.value, {'name': user.profile.name, 'link': url}, 'Register')
 
     @classmethod
-    def recovery_password_email(cls, user):
-        token = JwtService.create_recovery_password_token(user)
-        url = f'{os.environ.get("FRONTEND_URL")}/auth/recovery_password/{token}'
-        cls._send_email(user.email, TemplateEnum.RECOVERY_PASSWORD.value, {'name': user.profile.name, 'link': url},
-                        'Recovery Password')
+    def recovery_email(cls, user):
+        token = JwtService.create_token(user, RecoveryToken)
+        url = f'{os.environ.get("FRONTEND_URL")}/recovery/{token}'
+        cls._send_email(user.email, TemplateEnum.RECOVERY.value, {'name': user.profile.name, 'link': url}, 'Recovery')

@@ -1,9 +1,16 @@
+from django.contrib.auth import get_user_model
+
 from rest_framework import status
-from rest_framework.generics import GenericAPIView
+from rest_framework.generics import GenericAPIView, get_object_or_404
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from core.services.jwt_service import JwtService
+from core.services.email_service import EmailService
+from core.services.jwt_service import ActivateToken, JwtService, RecoveryToken
+
+from .serializers import EmailSerializer, PasswordSerializer
+
+UserModel = get_user_model()
 
 
 class ActivateUserView(GenericAPIView):
@@ -11,23 +18,37 @@ class ActivateUserView(GenericAPIView):
 
     def get(self, *args, **kwargs):
         token = kwargs.get('token')
-        user = JwtService.validate_activate_token(token)
+        user = JwtService.validate_token(token, ActivateToken)
         user.is_active = True
         user.save()
         return Response(status=status.HTTP_200_OK)
 
 
-class RecoveryPasswordView(GenericAPIView):
+class RecoveryPasswordRequestView(GenericAPIView):
+    permission_classes = (AllowAny,)
+
+    def post(self, *args, **kwargs):
+        email = self.request.data
+        serializer = EmailSerializer(data=email)
+        serializer.is_valid(raise_exception=True)
+        user_email = serializer.data.get('email')
+
+        user = get_object_or_404(UserModel, email=user_email)
+        EmailService.recovery_email(user)
+        return Response(status=status.HTTP_200_OK)
+
+
+class ChangePasswordView(GenericAPIView):
     permission_classes = (AllowAny,)
 
     def post(self, *args, **kwargs):
         token = kwargs.get('token')
-        new_password = self.request.data.get('new_password')
+        user = JwtService.validate_token(token, RecoveryToken)
 
-        if not new_password:
-            return Response({'new_password': 'this field is required'}, status=status.HTTP_400_BAD_REQUEST)
+        data = self.request.data
+        serializer = PasswordSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
 
-        user = JwtService.validate_recovery_password_token(token)
-        user.set_password(new_password)
+        user.set_password(serializer.data.get('password'))
         user.save()
         return Response(status=status.HTTP_200_OK)

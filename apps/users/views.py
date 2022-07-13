@@ -1,13 +1,11 @@
 from django.contrib.auth import get_user_model
 
 from rest_framework import status
-from rest_framework.generics import GenericAPIView, ListCreateAPIView, UpdateAPIView, get_object_or_404
+from rest_framework.generics import GenericAPIView, ListCreateAPIView, UpdateAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from core.permissions.user_permissions import IsSuperUser
-from core.services.email_service import EmailService
-from core.services.jwt_service import JwtService
 
 from .serializers import AddAvatarSerializer, UserSerializer
 
@@ -55,17 +53,3 @@ class AdminToUserView(UserToAdminView):
 
         serializer = self.serializer_class(candidate)
         return Response(serializer.data, status.HTTP_200_OK)
-
-
-class RecoveryPasswordView(GenericAPIView):
-    permission_classes = (AllowAny,)
-
-    def get(self, *args, **kwargs):
-        email = self.request.data.get('email')
-
-        if not email:
-            return Response({'email': 'this field is required'}, status.HTTP_400_BAD_REQUEST)
-
-        user = get_object_or_404(UserModel, email=email)
-        EmailService.recovery_password_email(user)
-        return Response({'data': 'check your mail'}, status=status.HTTP_200_OK)
