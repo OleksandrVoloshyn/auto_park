@@ -8,4 +8,4 @@ class AutoParkFilter(filters.FilterSet):
 
     class Meta:
         model = AutoParksModel
-        fields = ('cars',)
+        fields = ('cars_year_lt',)
