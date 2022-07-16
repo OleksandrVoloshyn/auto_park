@@ -12,13 +12,15 @@ class CarListView(ListAPIView):
     permission_classes = (AllowAny,)
     filterset_class = CarFilter
 
-    # def get_queryset(self):
-    #     auto_park_id = self.request.query_params.get('autoParkId')
-    #     if auto_park_id:
-    #         return self.queryset.filter(auto_park_id=auto_park_id)
-    #     return super().get_queryset()
-
 
 class CarUpdateRetrieveDestroyView(RetrieveUpdateDestroyAPIView):
+    """
+    get:
+        Get a Car
+    put:
+        Update car
+    delete:
+        Delete car
+    """
     queryset = CarModel.objects
     serializer_class = CarSerializer
