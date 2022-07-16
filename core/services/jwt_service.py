@@ -24,11 +24,11 @@ class RecoveryToken(ActivateToken):
 
 class JwtService:
     @staticmethod
-    def create_token(user, token_class: Type[Union[Token, BlacklistMixin]]):
+    def create_token(user, token_class: Type[Token | BlacklistMixin]):
         return token_class.for_user(user)
 
     @staticmethod
-    def validate_token(token, token_class: Type[Union[Token, BlacklistMixin]]):
+    def validate_token(token, token_class: Type[Token | BlacklistMixin]):
         try:
             action_token = token_class(token)
             action_token.check_blacklist()
