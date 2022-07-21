@@ -7,7 +7,7 @@ ENV PYTHONUNBUFFERED=1
 RUN apk add --no-cache --virtual ..build-deps gcc musl-dev mariadb-dev
 #for Pillow
 RUN apk add jpeg-dev zlib-dev libjpeg
-
+# ctrl+c
 RUN mkdir /app
 WORKDIR /app
 
